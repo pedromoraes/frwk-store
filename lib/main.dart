@@ -39,6 +39,8 @@ class StoreDisplay extends StatefulWidget {
 }
 
 class _StoreDisplayState extends State<StoreDisplay> {
+  var _dataset = products;
+
   void _add(product) {
     setState(() {
       data.cart.add(product);
@@ -46,8 +48,20 @@ class _StoreDisplayState extends State<StoreDisplay> {
   }
 
   void _buy() {
+    Navigator.pushNamed(context, data.login ? '/checkout' : '/login')
+        .then((_) => setState(() {
+              data.cart.clear();
+            }));
+  }
+
+  void _refineSearch(String query) {
     setState(() {
-      Navigator.pushNamed(context, data.login ? '/checkout' : '/login');
+      _dataset = query.isEmpty
+          ? products
+          : products
+              .where(
+                  (p) => p['name'].toLowerCase().contains(query.toLowerCase()))
+              .toList();
     });
   }
 
@@ -66,37 +80,49 @@ class _StoreDisplayState extends State<StoreDisplay> {
         title: Text(widget.title),
       ),
       floatingActionButton: data.cart.length > 0 ? _checkoutButton() : null,
-      body: GridView.builder(
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200.0,
-            crossAxisSpacing: 30.0,
-            mainAxisSpacing: 30.0,
-          ),
-          padding: EdgeInsets.all(20.0),
-          itemCount: products.length,
-          itemBuilder: (BuildContext ctx, index) {
-            return Container(
-                padding: EdgeInsets.all(5.0),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black12, width: 1.0),
-                    borderRadius: BorderRadius.circular(0.85)),
-                child: Column(children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(products[index]["name"]),
-                        Text(currencyFormatter.format(products[index]["price"]))
-                      ]),
-                  Expanded(
-                      child: Image(
-                    image: AssetImage(products[index]["img"]),
-                    fit: BoxFit.fitHeight,
-                  )),
-                  TextButton(
-                      onPressed: () => {_add(products[index])},
-                      child: Text('Buy'))
-                ]));
-          }),
+      body: Center(
+          child: Column(children: [
+        TextField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Search products',
+              isDense: true,
+            ),
+            onChanged: (e) => _refineSearch(e)),
+        Expanded(
+            child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 200.0,
+                  crossAxisSpacing: 30.0,
+                  mainAxisSpacing: 30.0,
+                ),
+                padding: EdgeInsets.all(20.0),
+                itemCount: _dataset.length,
+                itemBuilder: (BuildContext ctx, index) {
+                  return Container(
+                      padding: EdgeInsets.all(5.0),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black12, width: 1.0),
+                          borderRadius: BorderRadius.circular(0.85)),
+                      child: Column(children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(_dataset[index]["name"]),
+                              Text(currencyFormatter
+                                  .format(products[index]["price"]))
+                            ]),
+                        Expanded(
+                            child: Image(
+                          image: AssetImage(_dataset[index]["img"]),
+                          fit: BoxFit.fitHeight,
+                        )),
+                        TextButton(
+                            onPressed: () => {_add(_dataset[index])},
+                            child: Text('Buy'))
+                      ]));
+                }))
+      ])),
     );
   }
 }

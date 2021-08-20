@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-loginPage(BuildContext context, data) {
+Widget loginPage(BuildContext context, data) {
   return Scaffold(
     appBar: AppBar(
       title: const Text('Login'),

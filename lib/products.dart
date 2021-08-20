@@ -8,4 +8,5 @@ final List<Map> products = [
     "price": 5.50
   },
   {"id": 3, "name": "Mango", "img": "graphics/mango.png", "price": 10.0},
+  {"id": 4, "name": "Banana", "img": "graphics/banana.png", "price": 1.0},
 ];
